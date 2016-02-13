@@ -8,11 +8,18 @@
     tools:context=".activities.NewsSearchActivity"
     tools:showIn="@layout/activity_news_search">
 
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipeContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvArticles"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#f7f7f7" />
+        android:background="#e0dddd" />
 
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

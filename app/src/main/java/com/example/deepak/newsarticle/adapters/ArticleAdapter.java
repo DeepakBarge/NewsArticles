@@ -3,18 +3,16 @@ package com.example.deepak.newsarticle.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
+import com.bumptech.glide.Glide;
 import com.example.deepak.newsarticle.R;
 import com.example.deepak.newsarticle.activities.NewsDetailActivity;
 import com.example.deepak.newsarticle.models.Article;
-import com.squareup.picasso.Picasso;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -27,18 +25,25 @@ import java.util.Random;
 // Note that we specify the custom ViewHolder which gives us access to our views
 public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHolder> {
 
-    List<Article> articles = new ArrayList<>();
+    public List<Article> articles = new ArrayList<>();
     private Context context;
-
 
     public ArticleAdapter(Context context){
         this.context = context;
     }
 
-    public void updateList (List<Article> articles) {
-        this.articles = articles;
-        notifyDataSetChanged();
+    public void appendList (List<Article> articles) {
+        // append the new articles to the adapter
+        this.articles.addAll(articles);
+        Log.i("info", "Number of articles " + this.articles.size());
     }
+
+    public void addAtStartList (List<Article> articles) {
+        // append the new articles to the adapter
+        this.articles.addAll(0, articles);
+        Log.i("info", "Number of articles " + this.articles.size());
+    }
+
 
     // Usually involves inflating a layout from XML and returning the holder
     @Override
@@ -65,14 +70,21 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
         Article article = articles.get(position);
 
         // Set item views based on the data model
-        holder.tvHeadline.setText(article.articleHeadline);
+        holder.tvHeadline.setText(article.getArticleHeadline());
+
+        holder.ivImage.setImageResource(0);
 
         if(article.thumbnailUrls.length>0){
             String url = article.getThumbnailUrl(new Random().nextInt(article.thumbnailUrls.length));
 
-            Picasso.with(context)
+            Glide.with(context)
                 .load(url)
+                .fitCenter()
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.error)
                 .into(holder.ivImage);
+        } else {
+            holder.ivImage.setImageResource(R.drawable.ic_no_thumbail);
         }
 
     }

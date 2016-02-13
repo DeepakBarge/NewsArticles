@@ -49,7 +49,7 @@ public class Article implements Parcelable {
                 thumbnailUrls = new String[0];
             }
             Log.i("info",this.toString());
-            //feedItems.add(fItem);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

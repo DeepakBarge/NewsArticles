@@ -2,17 +2,25 @@ package com.example.deepak.newsarticle.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 import com.example.deepak.newsarticle.R;
 import com.example.deepak.newsarticle.models.Article;
 
 public class NewsDetailActivity extends AppCompatActivity {
+
+    private ShareActionProvider miShareAction;
+    WebView wvView;
+    ProgressBar mProgressItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,23 +29,18 @@ public class NewsDetailActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Details");
+
+        mProgressItem = (ProgressBar) findViewById(R.id.pbProgressAction);
+        mProgressItem.setVisibility(View.VISIBLE);
 
         Intent i = getIntent();
         Article article = i.getParcelableExtra("article");
 
         String url = article.getWebUrl();
 
-        WebView wvView = (WebView) findViewById(R.id.webView);
+        wvView = (WebView) findViewById(R.id.webView);
 
         wvView.setWebViewClient(new WebViewClient() {
             @Override
@@ -46,14 +49,52 @@ public class NewsDetailActivity extends AppCompatActivity {
                 view.loadUrl(url);
                 return true;
             }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                mProgressItem.setVisibility(View.GONE);
+            }
         });
 
         wvView.loadUrl(url);
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.menu_news_detail, menu);
+
+        MenuItem item = menu.findItem(R.id.menu_item_share);
+
+        miShareAction = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+
+        shareIntent.putExtra(Intent.EXTRA_TEXT, wvView.getUrl());
+
+        miShareAction.setShareIntent(shareIntent);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        if(id == R.id.menu_item_share){
+            //Toast.makeText(this,"share selected",Toast.LENGTH_SHORT).show();
+        }
+
+
+        return super.onOptionsItemSelected(item);
+    }
+
     /* this method is overridden to prevent the UP button from creating a new activity
-        instead of showing the old one */
+       instead of showing the old activity */
     @Override
     public Intent getSupportParentActivityIntent() {
         finish();
