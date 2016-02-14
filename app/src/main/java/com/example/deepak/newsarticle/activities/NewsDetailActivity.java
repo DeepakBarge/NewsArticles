@@ -6,9 +6,13 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
@@ -16,13 +20,15 @@ import com.example.deepak.newsarticle.R;
 import com.example.deepak.newsarticle.models.Article1;
 import com.example.deepak.newsarticle.models.Article1;
 import com.example.deepak.newsarticle.models.Article2;
+import com.example.deepak.newsarticle.utils.ApplicationHelper;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class NewsDetailActivity extends AppCompatActivity {
+public class NewsDetailActivity extends AppCompatActivity implements ApplicationHelper.AlertDialogListener {
 
     private ShareActionProvider miShareAction;
+    String url = "";
 
     @Bind(R.id.toolbar) Toolbar toolbar;
     @Bind(R.id.pbProgressAction) ProgressBar mProgressItem;
@@ -38,8 +44,7 @@ public class NewsDetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Details");
 
-        mProgressItem.setVisibility(View.VISIBLE);
-        String url = "";
+        ApplicationHelper.setContext(NewsDetailActivity.this);
 
         Intent i = getIntent();
 
@@ -67,9 +72,31 @@ public class NewsDetailActivity extends AppCompatActivity {
                 super.onPageFinished(view, url);
                 mProgressItem.setVisibility(View.GONE);
             }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                Log.i("info","page load error1");
+            }
+
+            @Override
+            public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+                Log.i("info","page load error2");
+
+            }
+
         });
 
-        wvView.loadUrl(url);
+        loadRemotePage();
+
+    }
+
+    public void loadRemotePage(){
+        if(!ApplicationHelper.isNetworkAvailable(getApplicationContext()) || !ApplicationHelper.isOnline()){
+            ApplicationHelper.showWarning(NewsDetailActivity.this);
+        } else {
+            mProgressItem.setVisibility(View.VISIBLE);
+            wvView.loadUrl(url);
+        }
 
     }
 
@@ -113,4 +140,13 @@ public class NewsDetailActivity extends AppCompatActivity {
         return null;
     }
 
+    @Override
+    public void onTryAgain() {
+        loadRemotePage();
+    }
+
+    @Override
+    public void onCancel() {
+        mProgressItem.setVisibility(View.GONE);
+    }
 }

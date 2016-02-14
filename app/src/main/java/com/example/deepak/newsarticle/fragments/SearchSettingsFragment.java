@@ -160,18 +160,4 @@ public class SearchSettingsFragment extends DialogFragment implements  DatePicke
         dismiss();
     }
 
-
-    /*@Override
-    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        if (EditorInfo.IME_ACTION_DONE == actionId) {
-            Log.i("info","done pressed");
-
-            //Return input text to activity
-            EditNameDialogListener listener = (EditNameDialogListener) getActivity();
-            listener.onFinishEditDialog(mEditText.getText().toString());
-            dismiss();
-            return true;
-        }
-        return false;
-    }*/
 }

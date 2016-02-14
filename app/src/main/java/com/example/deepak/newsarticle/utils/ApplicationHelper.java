@@ -7,9 +7,22 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import com.example.deepak.newsarticle.R;
+import com.example.deepak.newsarticle.models.FilterParameters;
+
 import java.io.IOException;
 
 public class ApplicationHelper {
+
+    public static Context context;
+
+    public interface AlertDialogListener {
+        void onTryAgain();
+        void onCancel();
+    }
+
+    public static void setContext(Context c){
+        context = c;
+    }
 
     public static boolean isOnline() {
         Runtime runtime = Runtime.getRuntime();
@@ -29,7 +42,7 @@ public class ApplicationHelper {
         return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
 
-    public static void showWarning(Context context) {
+    public static void showWarning(final Context context) {
 
         String message = "";
 
@@ -48,6 +61,8 @@ public class ApplicationHelper {
                 .setIcon(R.drawable.ic_warning)
                 .setPositiveButton("Try again", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        AlertDialogListener listener = (AlertDialogListener) context;
+                        listener.onTryAgain();
                         dialog.cancel();
                     }
                 })
