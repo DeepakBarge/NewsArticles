@@ -1,6 +1,7 @@
 package com.example.deepak.newsarticle.activities;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.MenuItemCompat;
@@ -11,17 +12,17 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.example.deepak.newsarticle.R;
 import com.example.deepak.newsarticle.adapters.ArticleAdapter;
-import com.example.deepak.newsarticle.fragments.DatePickerFragment;
 import com.example.deepak.newsarticle.fragments.SearchSettingsFragment;
+import com.example.deepak.newsarticle.listeners.EndlessRecyclerViewScrollListener;
 import com.example.deepak.newsarticle.models.Article;
 import com.example.deepak.newsarticle.models.FilterParameters;
+import com.example.deepak.newsarticle.utils.ApplicationHelper;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -30,31 +31,34 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
-
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 
 public class NewsSearchActivity extends AppCompatActivity implements SearchSettingsFragment.EditNameDialogListener{
 
-
     final static String BASE_URI = "http://api.nytimes.com/svc/search/v2/articlesearch.json";
     final static String API_KEY = "8003c034b43c89e39cd38d9cb0c4bc89:9:74356829";
+    final static int REFRESH_OPERATION = 1;
+    final static int SCROLL_OPERATION = 0;
+
+    @Bind(R.id.rvArticles) RecyclerView rvArticles;
+    @Bind(R.id.swipeContainer) SwipeRefreshLayout swipeContainer;
+    @Bind(R.id.toolbar) Toolbar toolbar;
+
     ArticleAdapter adapter;
     ArrayList<Article> fetchedArticles;
-    RecyclerView rvArticles;
     MenuItem miActionProgressItem;
     String searchText;
     FilterParameters fp = new FilterParameters();
-    private SwipeRefreshLayout swipeContainer;
     int refreshCount;
-
-    final static int REFRESH_OPERATION = 1;
-    final static int SCROLL_OPERATION = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news_search);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
+
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -62,8 +66,6 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
 
         fetchedArticles = new ArrayList<>();
 
-        // Lookup the recyclerview in activity layout
-        rvArticles = (RecyclerView) findViewById(R.id.rvArticles);
         // Create adapter passing in the sample user data
         adapter = new ArticleAdapter(this);
         // Attach the adapter to the recyclerview to populate items
@@ -71,9 +73,8 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
 
         // Set layout manager to position the items
         StaggeredGridLayoutManager staggeredGridLayoutManager =
-                new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+                new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
 
-        //rvArticles.setLayoutManager(new GridLayoutManager(this, 2));
         //gridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
         rvArticles.setLayoutManager(staggeredGridLayoutManager);
 
@@ -88,7 +89,6 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
             }
         });
 
-        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
         // Setup refresh listener which triggers new data loading
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -107,6 +107,10 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
+        if(!ApplicationHelper.isNetworkAvailable(getApplicationContext()) || !ApplicationHelper.isOnline()){
+            ApplicationHelper.showWarning(NewsSearchActivity.this);
+        }
+
     }
 
     private void showEditDialog() {
@@ -115,11 +119,6 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
         searchSettings.context = this;
         searchSettings.show(fm, "fragment_search_settings");
     }
-
-    /*public void showDatePickerDialog(View v){
-        DialogFragment dialogFragment = new DatePickerFragment();
-        dialogFragment.show(getFragmentManager(), "start_date_picker");
-    }*/
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -168,8 +167,6 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
                 refreshCount = 0;
 
                 //must clear the elements of the previous search
-                //articles.clear();
-
                 int curSize = adapter.getItemCount();
                 adapter.articles.clear();
                 adapter.notifyItemRangeRemoved(0, curSize);
@@ -224,62 +221,89 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
             fq.append(")");
             params.put("fq",fq.toString());
             Log.i("info","fq: "+fq);
-            //params.put("fq","news_desk:("Sports",");
-            //params.put("fq", "news_desk:(\"Fashion & Style\")");
         }
         // page[0-9]
         params.put("page", page);
         Log.i("info", params.toString());
         showProgressBar();
 
-        client.get(BASE_URI, params, new JsonHttpResponseHandler() {
+        try {
+            client.get(BASE_URI, params, new JsonHttpResponseHandler() {
 
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.i("info", response.toString());
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    Log.i("info", response.toString());
 
-                try {
-                    JSONArray articleJSON = response.getJSONObject("response").getJSONArray("docs");
-                    fetchedArticles = Article.getAllArticles(articleJSON);
+                    try {
+                        JSONArray articleJSON = response.getJSONObject("response").getJSONArray("docs");
+                        fetchedArticles = Article.getAllArticles(articleJSON);
 
-                    if (operation == SCROLL_OPERATION) {
-                        // get current size of the adapter
-                        int curSize = adapter.getItemCount();
-                        adapter.appendList(fetchedArticles);
-                        //adapter.notifyDataSetChanged();
-                        adapter.notifyItemRangeInserted(curSize, adapter.getItemCount() - 1);
-                        //adapter.notifyItemRangeInserted(0, fetchedArticles.size() - 1);
+                        if (operation == SCROLL_OPERATION) {
+                            // get current size of the adapter
+                            int curSize = adapter.getItemCount();
+                            adapter.appendList(fetchedArticles);
+                            //adapter.notifyDataSetChanged();
+                            adapter.notifyItemRangeInserted(curSize, adapter.getItemCount() - 1);
+                            //adapter.notifyItemRangeInserted(0, fetchedArticles.size() - 1);
 
-                        Log.i("info", fetchedArticles.toString());
-                        Log.i("info", "Scroll - Range inserted [" + curSize + "-" + adapter.getItemCount() + "]");
-                    } else {
-                        // get current size of the adapter
-                        int curSize = fetchedArticles.size() - 1;
-                        adapter.addAtStartList(fetchedArticles);
-                        //adapter.notifyDataSetChanged();
-                        adapter.notifyItemRangeInserted(0, curSize);
+                            Log.i("info", fetchedArticles.toString());
+                            Log.i("info", "Scroll - Range inserted [" + curSize + "-" + adapter.getItemCount() + "]");
+                        } else {
+                            // get current size of the adapter
+                            int curSize = fetchedArticles.size() - 1;
+                            adapter.addAtStartList(fetchedArticles);
+                            //adapter.notifyDataSetChanged();
+                            adapter.notifyItemRangeInserted(0, curSize);
 
-                        Log.i("info", fetchedArticles.toString());
-                        Log.i("info", "REFRESH - Range inserted [ 0-" + curSize + "]");
+                            Log.i("info", fetchedArticles.toString());
+                            Log.i("info", "REFRESH - Range inserted [ 0-" + curSize + "]");
 
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } finally {
+                        hideProgressBar();
+                        swipeContainer.setRefreshing(false);
                     }
+                }
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } finally {
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    Log.i("info", "onfailure1 received");
+                    refreshCount--;
                     hideProgressBar();
                     swipeContainer.setRefreshing(false);
+                    Log.i("info","Cause: "+throwable.getCause());
+                    ApplicationHelper.showWarning(NewsSearchActivity.this);
+
                 }
-            }
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Toast.makeText(getApplicationContext(), "Unable to connect to NYTimes. " +
-                        "Check your n/w connection. Try again later", Toast.LENGTH_SHORT).show();
-                refreshCount--;
-            }
-        });
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                    Log.i("info", "onfailure2 received");
+                    refreshCount--;
+                    hideProgressBar();
+                    swipeContainer.setRefreshing(false);
 
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    Log.i("info", "onfailure3 received");
+                    Toast.makeText(getApplicationContext(), "Unable to connect to NYTimes. " +
+                            "Check your n/w connection. Try again later", Toast.LENGTH_SHORT).show();
+                    refreshCount--;
+                    hideProgressBar();
+                    swipeContainer.setRefreshing(false);
+
+                }
+            });
+        } catch (Exception e){
+            //Log.i("info"," inside http call: "+e.getCause());
+            hideProgressBar();
+            swipeContainer.setRefreshing(false);
+        }
     }
 
     @Override
@@ -300,12 +324,6 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
                 return super.onOptionsItemSelected(item);
         }
 
-    }
-
-    // attach to an onclick handler to show the date picker
-    public void showDateTimePickerDialog(View v) {
-        DatePickerFragment newFragment = new DatePickerFragment();
-        newFragment.show(getSupportFragmentManager(), "datePicker");
     }
 
     @Override

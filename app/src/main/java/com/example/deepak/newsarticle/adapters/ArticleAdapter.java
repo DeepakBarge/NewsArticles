@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * Created by deepak on 2/10/16.
  */
@@ -101,9 +104,10 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         // Your holder should contain a member variable
         // for any view that will be set as you render a row
-        public ImageView ivImage;
-        public TextView tvHeadline;
         private Context context;
+
+        @Bind(R.id.ivImage) ImageView ivImage;
+        @Bind(R.id.tvHeadline) TextView tvHeadline;
 
         // We also create a constructor that accepts the entire item row
         // and does the view lookups to find each subview
@@ -111,9 +115,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
             // Stores the itemView in a public final member variable that can be used
             // to access the context from any ViewHolder instance.
             super(itemView);
-
-            this.ivImage = (ImageView) itemView.findViewById(R.id.ivImage);
-            this.tvHeadline = (TextView) itemView.findViewById(R.id.tvHeadline);
+            ButterKnife.bind(this, itemView);
             this.context = context;
 
             itemView.setOnClickListener(this);

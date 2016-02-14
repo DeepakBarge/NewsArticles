@@ -12,35 +12,35 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 import com.example.deepak.newsarticle.R;
 import com.example.deepak.newsarticle.models.Article;
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 public class NewsDetailActivity extends AppCompatActivity {
 
     private ShareActionProvider miShareAction;
-    WebView wvView;
-    ProgressBar mProgressItem;
+
+    @Bind(R.id.toolbar) Toolbar toolbar;
+    @Bind(R.id.pbProgressAction) ProgressBar mProgressItem;
+    @Bind(R.id.webView) WebView wvView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news_detail);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        ButterKnife.bind(this);
 
+        setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Details");
 
-        mProgressItem = (ProgressBar) findViewById(R.id.pbProgressAction);
         mProgressItem.setVisibility(View.VISIBLE);
 
         Intent i = getIntent();
         Article article = i.getParcelableExtra("article");
 
         String url = article.getWebUrl();
-
-        wvView = (WebView) findViewById(R.id.webView);
 
         wvView.setWebViewClient(new WebViewClient() {
             @Override

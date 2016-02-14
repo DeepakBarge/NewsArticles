@@ -1,4 +1,4 @@
-package com.example.deepak.newsarticle.activities;
+package com.example.deepak.newsarticle.listeners;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;

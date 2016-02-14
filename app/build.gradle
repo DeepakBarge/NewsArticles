@@ -24,20 +24,22 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
+
     //async http client to make API calls
     compile 'com.loopj.android:android-async-http:1.4.9'
-
-    //picasso library for image d/l, transform, fit and finesse
-    //compile 'com.squareup.picasso:picasso:2.5.2'
 
     // annotation library
     compile 'com.jakewharton:butterknife:7.0.1'
 
+    //recycler view
     compile 'com.android.support:recyclerview-v7:23.1.1'
+
+    //card view
     compile 'com.android.support:cardview-v7:23.1.1'
 
-    //glide
+    //glide library for image d/l, transform, fit and finesse
     compile 'com.github.bumptech.glide:glide:3.5.2'
 
-
+    //GSON library
+    compile 'com.google.code.gson:gson:2.4'
 }
