@@ -1,7 +1,6 @@
 package com.example.deepak.newsarticle.activities;
 
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.MenuItemCompat;
@@ -20,9 +19,9 @@ import com.example.deepak.newsarticle.R;
 import com.example.deepak.newsarticle.adapters.ArticleAdapter;
 import com.example.deepak.newsarticle.fragments.SearchSettingsFragment;
 import com.example.deepak.newsarticle.listeners.EndlessRecyclerViewScrollListener;
-import com.example.deepak.newsarticle.models.Article;
 import com.example.deepak.newsarticle.models.FilterParameters;
 import com.example.deepak.newsarticle.utils.ApplicationHelper;
+import com.example.deepak.newsarticle.utils.JsonDeserializer;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -47,7 +46,7 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
     @Bind(R.id.toolbar) Toolbar toolbar;
 
     ArticleAdapter adapter;
-    ArrayList<Article> fetchedArticles;
+    ArrayList<Object> fetchedArticles;
     MenuItem miActionProgressItem;
     String searchText;
     FilterParameters fp = new FilterParameters();
@@ -236,7 +235,7 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
 
                     try {
                         JSONArray articleJSON = response.getJSONObject("response").getJSONArray("docs");
-                        fetchedArticles = Article.getAllArticles(articleJSON);
+                        fetchedArticles = JsonDeserializer.getAllArticles(articleJSON);
 
                         if (operation == SCROLL_OPERATION) {
                             // get current size of the adapter

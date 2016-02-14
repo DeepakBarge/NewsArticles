@@ -12,13 +12,11 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.deepak.newsarticle.R;
 import com.example.deepak.newsarticle.activities.NewsDetailActivity;
-import com.example.deepak.newsarticle.models.Article;
+import com.example.deepak.newsarticle.models.Article1;
+import com.example.deepak.newsarticle.models.Article2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import butterknife.Bind;
-import butterknife.ButterKnife;
 
 /**
  * Created by deepak on 2/10/16.
@@ -26,113 +24,185 @@ import butterknife.ButterKnife;
 
 // Create the basic adapter extending from RecyclerView.Adapter
 // Note that we specify the custom ViewHolder which gives us access to our views
-public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHolder> {
+public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    public List<Article> articles = new ArrayList<>();
+    // The items to display in your RecyclerView
+    public List<Object> articles = new ArrayList<>();
+
+    private final int ARTICLE1 = 0, ARTICLE2 = 1;
+
     private Context context;
 
-    public ArticleAdapter(Context context){
+    // Provide a suitable constructor (depends on the kind of dataset)
+    public ArticleAdapter(Context context) {
         this.context = context;
     }
 
-    public void appendList (List<Article> articles) {
-        // append the new articles to the adapter
+    // Return the size of your dataset (invoked by the layout manager)
+    @Override
+    public int getItemCount() {
+        return this.articles.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (articles.get(position) instanceof Article1) {
+            return ARTICLE1;
+        } else if (articles.get(position) instanceof Article2) {
+            return ARTICLE2;
+        }
+        return -1;
+    }
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        RecyclerView.ViewHolder viewHolder = null;
+        LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
+
+        switch (viewType) {
+            case ARTICLE1:
+                View v1 = inflater.inflate(R.layout.article_list_item, viewGroup, false);
+                viewHolder = new ViewHolder1(v1);
+                break;
+            case ARTICLE2:
+                View v2 = inflater.inflate(R.layout.article_list_item_textonly, viewGroup, false);
+                viewHolder = new ViewHolder2(v2);
+                break;
+            default:
+                break;
+        }
+        return viewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        switch (viewHolder.getItemViewType()) {
+            case ARTICLE1:
+                ViewHolder1 vh1 = (ViewHolder1) viewHolder;
+                configureViewHolder1(vh1, position);
+                break;
+            case ARTICLE2:
+                ViewHolder2 vh2 = (ViewHolder2) viewHolder;
+                configureViewHolder2(vh2, position);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void configureViewHolder1(ViewHolder1 vh1, int position) {
+        Article1 article1 = (Article1) articles.get(position);
+        if (article1 != null) {
+
+            vh1.getTvHeadline().setText(article1.getArticleHeadline());
+
+            vh1.getIvImage().setImageResource(0);
+
+            String url = article1.getThumbnailUrl(new Random().nextInt(article1.thumbnailUrls.length));
+
+            Glide.with(context)
+                    .load(url)
+                    .fitCenter()
+                    .placeholder(R.drawable.placeholder)
+                    .error(R.drawable.error)
+                    .into(vh1.getIvImage());
+        }
+    }
+
+    private void configureViewHolder2(ViewHolder2 vh2, int position) {
+        Article2 article2 = (Article2) articles.get(position);
+        if (article2 != null) {
+            vh2.getTvHeadline2().setText(article2.getArticleHeadline());
+        }
+    }
+
+    public void appendList (List<Object> articles) {
         this.articles.addAll(articles);
         Log.i("info", "Number of articles " + this.articles.size());
     }
 
-    public void addAtStartList (List<Article> articles) {
-        // append the new articles to the adapter
+    public void addAtStartList (List<Object> articles) {
+
         this.articles.addAll(0, articles);
         Log.i("info", "Number of articles " + this.articles.size());
     }
 
+    public class ViewHolder1 extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-    // Usually involves inflating a layout from XML and returning the holder
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        private ImageView ivImage;
+        private TextView tvHeadline;
 
-        Context context = parent.getContext();
-        LayoutInflater inflater = LayoutInflater.from(context);
+        public ViewHolder1(View v) {
+            super(v);
+            ivImage = (ImageView)v.findViewById(R.id.ivImage);
+            tvHeadline = (TextView) v.findViewById(R.id.tvHeadline);
+            v.setOnClickListener(this);
 
-        // Inflate the custom layout
-        View articleView = inflater.inflate(R.layout.article_list_item, parent, false);
-
-        // Return a new holder instance
-        ViewHolder viewHolder = new ViewHolder(context, articleView);
-        return viewHolder;
-    }
-
-    // Involves populating data into the item through holder
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-
-        //Log.i("info","bind");
-
-        // Get the data model based on position
-        Article article = articles.get(position);
-
-        // Set item views based on the data model
-        holder.tvHeadline.setText(article.getArticleHeadline());
-
-        holder.ivImage.setImageResource(0);
-
-        if(article.thumbnailUrls.length>0){
-            String url = article.getThumbnailUrl(new Random().nextInt(article.thumbnailUrls.length));
-
-            Glide.with(context)
-                .load(url)
-                .fitCenter()
-                .placeholder(R.drawable.placeholder)
-                .error(R.drawable.error)
-                .into(holder.ivImage);
-        } else {
-            holder.ivImage.setImageResource(R.drawable.ic_no_thumbail);
         }
 
-    }
+        public ImageView getIvImage() {
+            return ivImage;
+        }
 
-    // Return the total count of items
-    @Override
-    public int getItemCount() {
-        return articles.size();
-    }
+        public void setIvImage(ImageView ivImage) {
+            this.ivImage = ivImage;
+        }
 
+        public TextView getTvHeadline() {
+            return tvHeadline;
+        }
 
-    // Provide a direct reference to each of the views within a data item
-    // Used to cache the views within the item layout for fast access
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        // Your holder should contain a member variable
-        // for any view that will be set as you render a row
-        private Context context;
-
-        @Bind(R.id.ivImage) ImageView ivImage;
-        @Bind(R.id.tvHeadline) TextView tvHeadline;
-
-        // We also create a constructor that accepts the entire item row
-        // and does the view lookups to find each subview
-        public ViewHolder(Context context, View itemView) {
-            // Stores the itemView in a public final member variable that can be used
-            // to access the context from any ViewHolder instance.
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-            this.context = context;
-
-            itemView.setOnClickListener(this);
-
+        public void setTvHeadline(TextView tvHeadline) {
+            this.tvHeadline = tvHeadline;
         }
 
         @Override
         public void onClick(View v) {
+
             int position = getLayoutPosition(); // gets item position
 
-            Article a = articles.get(position);
-            //Toast.makeText(context, a.getArticleHeadline(), Toast.LENGTH_SHORT).show();
-
-            Intent i = new Intent(context, NewsDetailActivity.class);
-            i.putExtra("article",a);
-            context.startActivity(i);
+            if(articles.get(position) instanceof Article1){
+                Article1 a1 = (Article1) articles.get(position);
+                Intent i = new Intent(context, NewsDetailActivity.class);
+                i.putExtra("article",a1);
+                context.startActivity(i);
+            }
 
         }
     }
+
+
+    public class ViewHolder2 extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        private TextView tvHeadline2;
+
+        public ViewHolder2(View v) {
+            super(v);
+            tvHeadline2 = (TextView) v.findViewById(R.id.tvHeadline2);
+            v.setOnClickListener(this);
+        }
+
+        public TextView getTvHeadline2() {
+            return tvHeadline2;
+        }
+
+        public void setTvHeadline2(TextView tvHeadline2) {
+            this.tvHeadline2 = tvHeadline2;
+        }
+
+        @Override
+        public void onClick(View v) {
+
+            int position = getLayoutPosition(); // gets item position
+
+            if(articles.get(position) instanceof Article2){
+                Article2 a2 = (Article2) articles.get(position);
+                Intent i = new Intent(context, NewsDetailActivity.class);
+                i.putExtra("article",a2);
+                context.startActivity(i);
+            }
+
+        }
+    }
+
 }
