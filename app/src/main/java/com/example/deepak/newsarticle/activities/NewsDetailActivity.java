@@ -13,7 +13,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import com.example.deepak.newsarticle.R;
-import com.example.deepak.newsarticle.models.Article;
+import com.example.deepak.newsarticle.models.Article1;
+import com.example.deepak.newsarticle.models.Article1;
+import com.example.deepak.newsarticle.models.Article2;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -36,11 +39,20 @@ public class NewsDetailActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Details");
 
         mProgressItem.setVisibility(View.VISIBLE);
+        String url = "";
 
         Intent i = getIntent();
-        Article article = i.getParcelableExtra("article");
 
-        String url = article.getWebUrl();
+        if(i.getParcelableExtra("article") instanceof Article1){
+            Article1 a1 = i.getParcelableExtra("article");
+            url = a1.getWebUrl();
+        }
+
+        if(i.getParcelableExtra("article") instanceof Article2){
+            Article2 a2 = i.getParcelableExtra("article");
+            url = a2.getWebUrl();
+        }
+
 
         wvView.setWebViewClient(new WebViewClient() {
             @Override
