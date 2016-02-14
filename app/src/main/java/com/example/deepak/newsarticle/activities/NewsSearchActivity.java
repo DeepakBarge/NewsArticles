@@ -34,7 +34,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 
-public class NewsSearchActivity extends AppCompatActivity implements SearchSettingsFragment.EditNameDialogListener{
+public class NewsSearchActivity extends AppCompatActivity implements SearchSettingsFragment.EditNameDialogListener,
+    ApplicationHelper.AlertDialogListener{
 
     final static String BASE_URI = "http://api.nytimes.com/svc/search/v2/articlesearch.json";
     final static String API_KEY = "8003c034b43c89e39cd38d9cb0c4bc89:9:74356829";
@@ -50,7 +51,8 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
     MenuItem miActionProgressItem;
     String searchText;
     FilterParameters fp = new FilterParameters();
-    int refreshCount;
+    int pageNumber;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,7 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("News");
 
+        ApplicationHelper.setContext(NewsSearchActivity.this);
         fetchedArticles = new ArrayList<>();
 
         // Create adapter passing in the sample user data
@@ -77,14 +80,14 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
         //gridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
         rvArticles.setLayoutManager(staggeredGridLayoutManager);
 
-        refreshCount = 0;
+        pageNumber = 0;
 
         rvArticles.addOnScrollListener(new EndlessRecyclerViewScrollListener(staggeredGridLayoutManager){
 
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
-                Log.i("info","scroll - new items needed "+page);
-                fetchArticles(page, SCROLL_OPERATION);
+                Log.i("info","scroll - new items needed "+pageNumber);
+                fetchArticles(pageNumber, SCROLL_OPERATION);
             }
         });
 
@@ -95,9 +98,8 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
                 // Your code to refresh the list here.
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
-                Log.i("info","refresh - new items needed "+refreshCount);
-                fetchArticles(refreshCount, REFRESH_OPERATION);
-                refreshCount++;
+                Log.i("info", "refresh - new items needed " + pageNumber);
+                fetchArticles(pageNumber, REFRESH_OPERATION);
             }
         });
         // Configure the refreshing colors
@@ -163,7 +165,7 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
                 searchItem.collapseActionView();
 
                 //set refreshCount = 0 for new search
-                refreshCount = 0;
+                pageNumber = 0;
 
                 //must clear the elements of the previous search
                 int curSize = adapter.getItemCount();
@@ -258,6 +260,7 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
                             Log.i("info", "REFRESH - Range inserted [ 0-" + curSize + "]");
 
                         }
+                        pageNumber++;
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -270,7 +273,6 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                     Log.i("info", "onfailure1 received");
-                    refreshCount--;
                     hideProgressBar();
                     swipeContainer.setRefreshing(false);
                     Log.i("info","Cause: "+throwable.getCause());
@@ -281,7 +283,6 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
                     Log.i("info", "onfailure2 received");
-                    refreshCount--;
                     hideProgressBar();
                     swipeContainer.setRefreshing(false);
 
@@ -292,7 +293,6 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
                     Log.i("info", "onfailure3 received");
                     Toast.makeText(getApplicationContext(), "Unable to connect to NYTimes. " +
                             "Check your n/w connection. Try again later", Toast.LENGTH_SHORT).show();
-                    refreshCount--;
                     hideProgressBar();
                     swipeContainer.setRefreshing(false);
 
@@ -329,5 +329,15 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
     public void onFinishEditDialog(FilterParameters fp) {
         this.fp = fp;
         //Toast.makeText(this, "Date, " + fp.getBeginDate(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onTryAgain() {
+        fetchArticles(pageNumber, REFRESH_OPERATION);
+    }
+
+    @Override
+    public void onCancel() {
+
     }
 }

@@ -61,11 +61,11 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         switch (viewType) {
             case ARTICLE1:
-                View v1 = inflater.inflate(R.layout.article_list_item, viewGroup, false);
+                View v1 = inflater.inflate(R.layout.article_list_item_1, viewGroup, false);
                 viewHolder = new ViewHolder1(v1);
                 break;
             case ARTICLE2:
-                View v2 = inflater.inflate(R.layout.article_list_item_textonly, viewGroup, false);
+                View v2 = inflater.inflate(R.layout.article_list_item_2, viewGroup, false);
                 viewHolder = new ViewHolder2(v2);
                 break;
             default:
