@@ -1,11 +1,14 @@
 package com.example.deepak.newsarticle.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class FilterParameters {
+public class FilterParameters implements Parcelable {
 
     public String beginDate;
     public String sortOrder;
@@ -48,4 +51,32 @@ public class FilterParameters {
 
         this.sortOrder = "newest";
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.beginDate);
+        dest.writeString(this.sortOrder);
+        dest.writeSerializable(this.newsDesk);
+    }
+
+    protected FilterParameters(Parcel in) {
+        this.beginDate = in.readString();
+        this.sortOrder = in.readString();
+        this.newsDesk = (HashMap<String, Boolean>) in.readSerializable();
+    }
+
+    public static final Parcelable.Creator<FilterParameters> CREATOR = new Parcelable.Creator<FilterParameters>() {
+        public FilterParameters createFromParcel(Parcel source) {
+            return new FilterParameters(source);
+        }
+
+        public FilterParameters[] newArray(int size) {
+            return new FilterParameters[size];
+        }
+    };
 }

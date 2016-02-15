@@ -71,13 +71,14 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("News");
+        getSupportActionBar().setTitle("News Reader");
 
         ApplicationHelper.setContext(NewsSearchActivity.this);
         fetchedArticles = new ArrayList<>();
 
         // Create adapter passing in the sample user data
         adapter = new ArticleAdapter(this);
+
         // Attach the adapter to the recyclerview to populate items
         rvArticles.setAdapter(adapter);
 
@@ -137,7 +138,7 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
 
     private void showEditDialog() {
         FragmentManager fm = getSupportFragmentManager();
-        SearchSettingsFragment searchSettings = SearchSettingsFragment.newInstance();
+        SearchSettingsFragment searchSettings = SearchSettingsFragment.newInstance(fp);
         searchSettings.context = this;
         searchSettings.show(fm, "fragment_search_settings");
     }
@@ -194,6 +195,8 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
                 adapter.notifyItemRangeRemoved(0, curSize);
 
                 Log.i("info", "Range removed [0-" + curSize + "]");
+
+                getSupportActionBar().setTitle(query);
 
                 //fetch articles with 0th page for a new query
                 fetchArticles(0, SCROLL_OPERATION);
@@ -264,9 +267,8 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
                             // get current size of the adapter
                             int curSize = adapter.getItemCount();
                             adapter.appendList(fetchedArticles);
-                            //adapter.notifyDataSetChanged();
                             adapter.notifyItemRangeInserted(curSize, adapter.getItemCount() - 1);
-                            //adapter.notifyItemRangeInserted(0, fetchedArticles.size() - 1);
+                            //rvArticles.scrollToPosition(adapter.getItemCount() - 1);
 
                             Log.i("info", fetchedArticles.toString());
                             Log.i("info", "Scroll - Range inserted [" + curSize + "-" + adapter.getItemCount() + "]");
@@ -274,8 +276,8 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
                             // get current size of the adapter
                             int curSize = fetchedArticles.size() - 1;
                             adapter.addAtStartList(fetchedArticles);
-                            //adapter.notifyDataSetChanged();
                             adapter.notifyItemRangeInserted(0, curSize);
+                            //rvArticles.scrollToPosition(0);
 
                             Log.i("info", fetchedArticles.toString());
                             Log.i("info", "REFRESH - Range inserted [ 0-" + curSize + "]");

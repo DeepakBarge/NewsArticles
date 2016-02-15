@@ -36,7 +36,8 @@ The following **bonus** features are implemented:
 
 The following **additional** features are implemented:
 
-* [ ] List anything else that you can get done to improve the app functionality!
+* [x] Implemented slide-in/slide-out animation for activity transition 
+* [x] Implemented RecyclerView adapter animation and Item animation using third-party library 
 
 ## Video Walkthrough
 

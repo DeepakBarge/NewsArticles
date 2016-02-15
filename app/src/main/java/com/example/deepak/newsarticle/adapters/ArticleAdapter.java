@@ -1,5 +1,6 @@
 package com.example.deepak.newsarticle.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -164,8 +165,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             if(articles.get(position) instanceof Article1){
                 Article1 a1 = (Article1) articles.get(position);
                 Intent i = new Intent(context, NewsDetailActivity.class);
-                i.putExtra("article",a1);
+                i.putExtra("article", a1);
                 context.startActivity(i);
+                ((Activity)context).overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
             }
 
         }

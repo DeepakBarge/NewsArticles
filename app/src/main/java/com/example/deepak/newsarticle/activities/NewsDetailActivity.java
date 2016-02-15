@@ -42,7 +42,7 @@ public class NewsDetailActivity extends AppCompatActivity implements Application
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Details");
+        getSupportActionBar().setTitle(" News Details");
 
         ApplicationHelper.setContext(NewsDetailActivity.this);
 
