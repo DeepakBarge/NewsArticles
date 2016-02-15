@@ -263,28 +263,34 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
                         JSONArray articleJSON = response.getJSONObject("response").getJSONArray("docs");
                         fetchedArticles = JsonDeserializer.getAllArticles(articleJSON);
 
-                        if (operation == SCROLL_OPERATION) {
-                            // get current size of the adapter
-                            int curSize = adapter.getItemCount();
-                            adapter.appendList(fetchedArticles);
-                            adapter.notifyItemRangeInserted(curSize, adapter.getItemCount() - 1);
-                            //rvArticles.scrollToPosition(adapter.getItemCount() - 1);
+                        if(fetchedArticles.size()>0) {
 
-                            Log.i("info", fetchedArticles.toString());
-                            Log.i("info", "Scroll - Range inserted [" + curSize + "-" + adapter.getItemCount() + "]");
-                        } else {
-                            // get current size of the adapter
-                            int curSize = fetchedArticles.size() - 1;
-                            adapter.addAtStartList(fetchedArticles);
-                            adapter.notifyItemRangeInserted(0, curSize);
-                            //rvArticles.scrollToPosition(0);
+                            if (operation == SCROLL_OPERATION) {
+                                // get current size of the adapter
+                                int curSize = adapter.getItemCount();
+                                adapter.appendList(fetchedArticles);
+                                adapter.notifyItemRangeInserted(curSize, adapter.getItemCount() - 1);
 
-                            Log.i("info", fetchedArticles.toString());
-                            Log.i("info", "REFRESH - Range inserted [ 0-" + curSize + "]");
+                                /* this doesnt work because if we scroll down to new elements the adapter thinks more
+                                   elements are needed so it keeps scrolling infinitely making n/w calls to get new data */
+                                //rvArticles.scrollToPosition(adapter.getItemCount() - 1);
+                                //rvArticles.scrollToPosition(curSize+2);
 
+                                Log.i("info", fetchedArticles.toString());
+                                Log.i("info", "Scroll - Range inserted [" + curSize + "-" + adapter.getItemCount() + "]");
+                            } else {
+                                // get current size of the adapter
+                                int curSize = fetchedArticles.size() - 1;
+                                adapter.addAtStartList(fetchedArticles);
+                                adapter.notifyItemRangeInserted(0, curSize);
+                                rvArticles.scrollToPosition(0);
+
+                                Log.i("info", fetchedArticles.toString());
+                                Log.i("info", "REFRESH - Range inserted [ 0-" + curSize + "]");
+
+                            }
+                            pageNumber++;
                         }
-                        pageNumber++;
-
                     } catch (JSONException e) {
                         e.printStackTrace();
                     } finally {
