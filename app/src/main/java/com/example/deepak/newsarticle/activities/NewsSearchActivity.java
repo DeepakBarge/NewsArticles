@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.OvershootInterpolator;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.example.deepak.newsarticle.R;
@@ -33,6 +34,13 @@ import java.util.HashMap;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
+import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+import jp.wasabeef.recyclerview.adapters.SlideInBottomAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.FadeInAnimator;
+import jp.wasabeef.recyclerview.animators.FlipInLeftYAnimator;
+import jp.wasabeef.recyclerview.animators.ScaleInLeftAnimator;
+import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 public class NewsSearchActivity extends AppCompatActivity implements SearchSettingsFragment.EditNameDialogListener,
     ApplicationHelper.AlertDialogListener{
@@ -77,8 +85,21 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
         StaggeredGridLayoutManager staggeredGridLayoutManager =
                 new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
 
-        //gridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
+        staggeredGridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
         rvArticles.setLayoutManager(staggeredGridLayoutManager);
+
+
+        AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(adapter);
+        rvArticles.setAdapter(new SlideInBottomAnimationAdapter(alphaAdapter));
+
+
+        //ScaleInLeftAnimator animator = new ScaleInLeftAnimator();
+        //FlipInLeftYAnimator animator = new FlipInLeftYAnimator();
+        SlideInLeftAnimator animator = new SlideInLeftAnimator();
+        //animator.setInterpolator(new OvershootInterpolator());
+        rvArticles.setItemAnimator(animator);
+        rvArticles.getItemAnimator().setAddDuration(200);
+        rvArticles.getItemAnimator().setRemoveDuration(400);
 
         pageNumber = 0;
 
