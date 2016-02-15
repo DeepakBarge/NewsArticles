@@ -2,6 +2,12 @@
 
 **NYTimes News Reader** is an android app that allows a user to search for images on web using simple filters. The app utilizes [New York Times Search API](http://developer.nytimes.com/docs/read/article_search_api_v2).
 
+## Video Walkthrough
+
+Here's a walkthrough of implemented user stories:
+
+GIF created with [LiceCap](http://www.cockos.com/licecap/).
+
 ![demo](demo1.gif)
 ![demo](demo2.gif)
 ![demo](demo3.gif)
@@ -43,14 +49,6 @@ The following **additional** features are implemented:
 
 * [x] Implemented slide-in/slide-out animation for activity transition 
 * [x] Implemented RecyclerView adapter animation and Item animation using third-party library 
-
-## Video Walkthrough
-
-Here's a walkthrough of implemented user stories:
-
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
-
-GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
