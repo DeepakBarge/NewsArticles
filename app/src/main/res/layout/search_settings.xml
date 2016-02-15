@@ -14,7 +14,7 @@
         android:layout_alignParentStart="true"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="30dp"
-        android:textSize="16sp" />
+        android:textSize="13sp" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -24,13 +24,13 @@
         android:layout_toRightOf="@+id/beginDate"
         android:layout_toEndOf="@+id/beginDate"
         android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="40dp"
         android:inputType="text"
         android:imeOptions="actionDone"
         android:textSize="14sp" />
 
     <View style="@style/Divider"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="20dp"
         android:layout_marginLeft="20dp"
         android:layout_below="@+id/currentDate"
@@ -47,7 +47,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"
         android:layout_below="@+id/view2"
-        android:textSize="16sp" />
+        android:textSize="13sp" />
 
     <Spinner
         android:layout_width="wrap_content"
@@ -56,13 +56,13 @@
         android:layout_toRightOf="@+id/priorityLevel"
         android:layout_toEndOf="@+id/priorityLevel"
         android:spinnerMode="dropdown"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="40dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
         android:layout_below="@+id/view2" />
 
     <View style="@style/Divider"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="20dp"
         android:layout_marginLeft="20dp"
         android:layout_below="@+id/spinnerSortOrder"
@@ -79,7 +79,7 @@
         android:layout_alignParentStart="true"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
-        android:textSize="16sp" />
+        android:textSize="13sp" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -92,7 +92,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginLeft="40dp"
         android:checked="false"
-        android:textSize="14sp" />
+        android:textSize="12sp" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -104,7 +104,7 @@
         android:layout_toEndOf="@+id/tvNewsDesk"
         android:layout_marginLeft="40dp"
         android:checked="false"
-        android:textSize="14sp" />
+        android:textSize="12sp" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -116,7 +116,7 @@
         android:layout_toEndOf="@+id/tvNewsDesk"
         android:layout_marginLeft="40dp"
         android:checked="false"
-        android:textSize="14sp" />
+        android:textSize="12sp" />
 
     <Button
         android:layout_width="wrap_content"
@@ -126,6 +126,5 @@
         android:layout_below="@+id/cbSports"
         android:layout_centerHorizontal="true"
         android:textSize="12sp"
-        android:layout_marginTop="20sp" />
-
+        android:layout_marginTop="10sp" />
 </RelativeLayout>

@@ -15,21 +15,23 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.support.v4.app.DialogFragment;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
+
 import com.example.deepak.newsarticle.R;
 import com.example.deepak.newsarticle.models.FilterParameters;
+
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class SearchSettingsFragment extends DialogFragment implements  DatePickerDialog.OnDateSetListener, View.OnClickListener{
+public class SearchSettingsFragment extends DialogFragment implements  DatePickerDialog.OnDateSetListener, View.OnClickListener, Serializable{
 
 
-    String orderItems[];
     Calendar myCalendar = Calendar.getInstance();
 
     public Context context;
@@ -93,10 +95,10 @@ public class SearchSettingsFragment extends DialogFragment implements  DatePicke
         // Use `newInstance` instead as shown below
     }
 
-    public static SearchSettingsFragment newInstance() {
+    public static SearchSettingsFragment newInstance(FilterParameters filterParams) {
         SearchSettingsFragment frag = new SearchSettingsFragment();
         Bundle args = new Bundle();
-        //args.putString("title", title);
+        args.putParcelable("fp", filterParams);
         frag.setArguments(args);
         return frag;
     }
@@ -107,7 +109,11 @@ public class SearchSettingsFragment extends DialogFragment implements  DatePicke
         setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog);
 
         View view = inflater.inflate(R.layout.search_settings, container);
+
+        fp = getArguments().getParcelable("fp");
+
         ButterKnife.bind(this, view);
+
         return view;
     }
 
@@ -115,13 +121,9 @@ public class SearchSettingsFragment extends DialogFragment implements  DatePicke
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mEditText.setText(displayFormat.format(myCalendar.getTime()));
-        orderItems = new String[]{"oldest", "newest"};
-
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context,
                R.array.orderItems, android.R.layout.simple_spinner_dropdown_item);
 
-        //ArrayAdapter<String> pAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, orderItems);
         sortOrder.setAdapter(adapter);
 
         mEditText.setOnClickListener(this);
@@ -132,10 +134,40 @@ public class SearchSettingsFragment extends DialogFragment implements  DatePicke
 
         getDialog().setTitle("Filter parameters");
 
+        if(fp.getBeginDate().equalsIgnoreCase("")) {
+            mEditText.setText(displayFormat.format(myCalendar.getTime()));
+        } else {
+            mEditText.setText(fp.getBeginDate());
+        }
+
+        if(fp.getNewsDesk().get("arts")){
+            arts.setChecked(true);
+        }
+        if(fp.getNewsDesk().get("fs")){
+            fs.setChecked(true);
+        }
+        if(fp.getNewsDesk().get("sports")){
+            sports.setChecked(true);
+        }
+
+        setSpinnerToValue(sortOrder, fp.getSortOrder());
+
         // Show soft keyboard automatically and request focus to field
         mEditText.requestFocus();
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 
+    }
+
+    public void setSpinnerToValue(Spinner spinner, String value) {
+        int index = 0;
+        SpinnerAdapter adapter = spinner.getAdapter();
+        for (int i = 0; i < adapter.getCount(); i++) {
+            if (adapter.getItem(i).equals(value)) {
+                index = i;
+                break; // terminate loop
+            }
+        }
+        spinner.setSelection(index);
     }
 
     private void updateDate() {

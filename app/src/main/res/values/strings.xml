@@ -4,8 +4,8 @@
     <string name="action_search">Search</string>
     <string name="title_activity_news_detail">NewsDetailActivity</string>
     <string-array name="orderItems">
-        <item>Newest</item>
-        <item>Oldest</item>
+        <item>newest</item>
+        <item>oldest</item>
     </string-array>
     <string name="title_activity_main">MainActivity</string>
 </resources>
