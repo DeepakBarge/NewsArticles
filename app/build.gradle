@@ -42,4 +42,8 @@ dependencies {
 
     //GSON library
     compile 'com.google.code.gson:gson:2.4'
+
+    //Custom library for animations
+    compile 'jp.wasabeef:recyclerview-animators:2.2.0'
+
 }

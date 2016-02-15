@@ -103,8 +103,8 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             Glide.with(context)
                     .load(url)
                     .fitCenter()
-                    .placeholder(R.drawable.placeholder)
-                    .error(R.drawable.error)
+                    .placeholder(R.drawable.ic_placeholder)
+                    .error(R.drawable.ic_error)
                     .into(vh1.getIvImage());
         }
     }
