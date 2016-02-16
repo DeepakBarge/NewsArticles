@@ -132,7 +132,7 @@ public class NewsDetailActivity extends AppCompatActivity implements Application
         return super.onOptionsItemSelected(item);
     }
 
-    /* this method is overridden to prevent the UP button from creating a new activity
+    /* this method is overridden to prevent the UP/BACK button from creating a new activity
        instead of showing the old activity */
     @Override
     public Intent getSupportParentActivityIntent() {
