@@ -70,8 +70,10 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
 
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //never setup back/up button on the home screen
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("News Reader");
+        getSupportActionBar().setLogo(R.drawable.ic_warning);
 
         ApplicationHelper.setContext(NewsSearchActivity.this);
         fetchedArticles = new ArrayList<>();
@@ -283,7 +285,7 @@ public class NewsSearchActivity extends AppCompatActivity implements SearchSetti
                                 int curSize = fetchedArticles.size() - 1;
                                 adapter.addAtStartList(fetchedArticles);
                                 adapter.notifyItemRangeInserted(0, curSize);
-                                rvArticles.scrollToPosition(0);
+                                rvArticles.smoothScrollToPosition(0);
 
                                 Log.i("info", fetchedArticles.toString());
                                 Log.i("info", "REFRESH - Range inserted [ 0-" + curSize + "]");
