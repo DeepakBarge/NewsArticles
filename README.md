@@ -49,6 +49,11 @@ The following **additional** features are implemented:
 
 * [x] Implemented slide-in/slide-out animation for activity transition 
 * [x] Implemented RecyclerView adapter animation and Item animation using third-party library 
+* [x] Implemented AlertDialog for handling internet connectivity 
+* [x] Implemented CardView for showing the articles in the RecyclerView 
+* [x] Implemented collapsing search bar in the search bar to show progress 
+* [x] Implemented progress bar for NewsDetail n/w call
+
 
 ## Notes
 
